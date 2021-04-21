@@ -40,8 +40,8 @@ public class LoggerUtil {
                 .addComponent(triggeringPolicy);
 
         RootLoggerComponentBuilder rootLogger = builder.newRootLogger(Level.DEBUG);
-        rootLogger.add(builder.newAppenderRef("Console"));
-        rootLogger.add(builder.newAppenderRef("rolling"));
+        rootLogger.add(builder.newAppenderRef("Console").addAttribute("level", Level.INFO));
+        rootLogger.add(builder.newAppenderRef("rolling").addAttribute("level", Level.DEBUG));
 
         builder.add(appenderBuilder);
         builder.add(rootLogger);
@@ -54,8 +54,12 @@ public class LoggerUtil {
         LogManager.getLogger().info(message);
     }
 
-    public static void LogErrorMessage(String message){
-        LogManager.getLogger().info(message);
+    public static void LogDebugMessage(String message){
+        LogManager.getLogger().debug(message);
+    }
+
+    public static void LogErrorMessage(String message, Throwable throwable){
+        LogManager.getLogger().error(message, throwable);
     }
 
     public static void LogMakeTcpConnection(String peerID) {
