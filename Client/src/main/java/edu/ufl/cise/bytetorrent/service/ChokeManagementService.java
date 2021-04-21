@@ -81,7 +81,7 @@ public class ChokeManagementService {
             }
         }
         if (isPreferredNeighborsChanged) {
-            LoggerUtil.LogChangeNeighbors((ArrayList<Peer>) unchokeList);
+            LoggerUtil.logChangeNeighbors((ArrayList<Peer>) unchokeList);
         }
     }
 
@@ -100,7 +100,7 @@ public class ChokeManagementService {
                     if (unChokedPeer.getChoked()) {
                         unChokedPeer.setChoked(false);
                         unChokedPeer.getConnectionHandler().sendMessage(MessageGenerator.unChoke());
-                        LoggerUtil.LogOptUnchokeNeighbor(String.valueOf(unChokedPeer.getPeerId()));
+                        LoggerUtil.logOptUnchokeNeighbor(String.valueOf(unChokedPeer.getPeerId()));
                     }
                 }
             }

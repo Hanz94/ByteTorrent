@@ -50,7 +50,7 @@ public class LoggerUtil {
         Configurator.initialize(builder.build());
     }
 
-    public static void LogInfoMessage(String message){
+    public static void logInfoMessage(String message){
         LogManager.getLogger().info(message);
     }
 
@@ -58,67 +58,67 @@ public class LoggerUtil {
         LogManager.getLogger().debug(message);
     }
 
-    public static void LogErrorMessage(String message, Throwable throwable){
+    public static void logErrorMessage(String message, Throwable throwable){
         LogManager.getLogger().error(message, throwable);
     }
 
-    public static void LogMakeTcpConnection(String peerID) {
+    public static void logMakeTcpConnection(String peerID) {
         String message = "Peer "+ myPeer.getPeerId()+ " makes a connection to Peer "+peerID+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogConnectedMsg(String peerID) {
+    public static void logConnectedMsg(String peerID) {
         String message = "Peer "+ myPeer.getPeerId()+ " is connected from Peer "+peerID+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogChangeNeighbors(ArrayList<Peer> neighbors) {
+    public static void logChangeNeighbors(ArrayList<Peer> neighbors) {
         String message = "Peer "+ myPeer.getPeerId()+ " has the preferred neighbors ";
         for (Peer p : neighbors) {
             message += p.getPeerId()+",";
         }
-        LogInfoMessage(message.substring(0, message.length()-1));
+        logInfoMessage(message.substring(0, message.length()-1));
     }
 
-    public static void LogOptUnchokeNeighbor(String peerID) {
+    public static void logOptUnchokeNeighbor(String peerID) {
         String message = "Peer "+ myPeer.getPeerId()+ " has optimistically unchoked neighbor "+peerID+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogReceivedUnchokingMsg(String peerID) {
+    public static void logReceivedUnchokingMsg(String peerID) {
         String message = "Peer "+ myPeer.getPeerId()+ " is unchoked by "+peerID+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogReceivedChokingMsg(String peerID) {
+    public static void logReceivedChokingMsg(String peerID) {
         String message = "Peer "+ myPeer.getPeerId()+ " is choked by "+peerID+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogReceivedHaveMsg(String peerID, int piece_index) {
+    public static void logReceivedHaveMsg(String peerID, int piece_index) {
         String message = "Peer "+ myPeer.getPeerId()+ " received the ‘have’ message from "+peerID+" for the piece "+piece_index+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogReceivedInterestedMsg(String peerID) {
+    public static void logReceivedInterestedMsg(String peerID) {
         String message = "Peer "+ myPeer.getPeerId()+ " received the ‘interested’message from "+peerID+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogReceivedNotInterestedMsg(String peerID) {
+    public static void logReceivedNotInterestedMsg(String peerID) {
         String message = "Peer "+ myPeer.getPeerId()+ " received the ‘not interested’message from "+peerID+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogDownloadingPiece(String peerID, int piece_index, int number_of_piece) {
+    public static void logDownloadingPiece(String peerID, int piece_index, int number_of_piece) {
         String message = "Peer "+ myPeer.getPeerId()+ " has downloaded the piece "+piece_index+" from "+peerID+". " +
                 "Now the number of pieces it has is "+number_of_piece+".";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
-    public static void LogCompleteDownload(Peer connectedPeer) {
+    public static void logCompleteDownload(Peer connectedPeer) {
         String message = "Peer "+ connectedPeer.getPeerId()+ " has downloaded the complete file.";
-        LogInfoMessage(message);
+        logInfoMessage(message);
     }
 
     public static void setMyPeer(Peer myPeer) {

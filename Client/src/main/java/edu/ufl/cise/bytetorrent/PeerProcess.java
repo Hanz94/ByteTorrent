@@ -13,7 +13,7 @@ public class PeerProcess {
 
         final int id = Integer.parseInt(args[0]);
         LoggerUtil.initialize(id);
-        LoggerUtil.LogInfoMessage("Process Thread Started");
+        LoggerUtil.logInfoMessage("Process Thread Started");
         PeerInfoConfig peerInfo = PeerInfoConfig.getInstance();
         CommonConfig.initialize();
         Peer selfPeer = null;

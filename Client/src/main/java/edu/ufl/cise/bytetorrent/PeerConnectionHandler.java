@@ -47,11 +47,11 @@ public class PeerConnectionHandler extends Thread {
             try {
                 handshake = (Handshake) in.readObject();
             } catch (ClassNotFoundException e) {
-                LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
             }
 
             Peer thisPeer = peers.get(handshake.getID());
-            LoggerUtil.LogConnectedMsg(String.valueOf(thisPeer.getPeerId()));
+            LoggerUtil.logConnectedMsg(String.valueOf(thisPeer.getPeerId()));
             thisPeer.setConnectionHandler(this);
 
             if (peers.get(handshake.getID()) == null) {
@@ -70,10 +70,10 @@ public class PeerConnectionHandler extends Thread {
             }
 
         } catch (IOException e) {
-            LoggerUtil.LogErrorMessage(e.getMessage(), e);
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
             LoggerUtil.logDebugMessage("Shutting down peer connection handler for " + connectingPeer.getPeerId());
         } catch (Exception e) {
-            LoggerUtil.LogErrorMessage(e.getMessage(), e);
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
             LoggerUtil.logDebugMessage("Shutting down peer connection handler for " + connectingPeer.getPeerId());
         }
     }
@@ -86,7 +86,7 @@ public class PeerConnectionHandler extends Thread {
                 LoggerUtil.logDebugMessage("Send message: " + msg.getMessageType() + " to " + connectingPeer.getPeerId());
             }
         } catch (IOException e) {
-            LoggerUtil.LogErrorMessage(e.getMessage(), e);
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
         }
     }
 
@@ -100,20 +100,20 @@ public class PeerConnectionHandler extends Thread {
                 switch (message.getMessageType()) {
                     case CHOKE:
                         isMeChocked = true;
-                        LoggerUtil.LogReceivedChokingMsg(String.valueOf(connectingPeer.getPeerId()));
+                        LoggerUtil.logReceivedChokingMsg(String.valueOf(connectingPeer.getPeerId()));
                         break;
                     case UNCHOKE:
                         isMeChocked = false;
-                        LoggerUtil.LogReceivedUnchokingMsg(String.valueOf(connectingPeer.getPeerId()));
+                        LoggerUtil.logReceivedUnchokingMsg(String.valueOf(connectingPeer.getPeerId()));
                         sendRequestMessage();
                         break;
                     case INTERESTED:
                         connectingPeer.setInterested(true);
-                        LoggerUtil.LogReceivedInterestedMsg(String.valueOf(connectingPeer.getPeerId()));
+                        LoggerUtil.logReceivedInterestedMsg(String.valueOf(connectingPeer.getPeerId()));
                         break;
                     case NOT_INTERESTED:
                         connectingPeer.setInterested(false);
-                        LoggerUtil.LogReceivedNotInterestedMsg(String.valueOf(connectingPeer.getPeerId()));
+                        LoggerUtil.logReceivedNotInterestedMsg(String.valueOf(connectingPeer.getPeerId()));
                         break;
                     case HAVE:
                         HavePayLoad haveIndex = (HavePayLoad) message.getPayload();
@@ -121,10 +121,10 @@ public class PeerConnectionHandler extends Thread {
                             connectingPeer.setBitField(FileUtil.updateBitfield(haveIndex.getIndex(), connectingPeer.getBitField()));
                             if (FileManagementService.getNumFilePieces() == connectingPeer.incrementAndGetNoOfPieces()) {
                                 connectingPeer.setHasFile(true);
-                                LoggerUtil.LogCompleteDownload(connectingPeer);
+                                LoggerUtil.logCompleteDownload(connectingPeer);
                                 checkAllDownloaded();
                             }
-                            LoggerUtil.LogReceivedHaveMsg(String.valueOf(connectingPeer.getPeerId()), haveIndex.getIndex());
+                            LoggerUtil.logReceivedHaveMsg(String.valueOf(connectingPeer.getPeerId()), haveIndex.getIndex());
                         }
                         break;
                     case BITFIELD:
@@ -151,12 +151,12 @@ public class PeerConnectionHandler extends Thread {
                             FileManagementService.store(piece.getContent(), piece.getIndex());
                             selfPeer.setBitField(FileManagementService.getBitField());
                         } catch (Exception e) {
-                            LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                            LoggerUtil.logErrorMessage(e.getMessage(), e);
                         }
                         peers.values().stream().filter(peer -> peer.getConnectionHandler() != null).forEach(peer -> peer.getConnectionHandler().sendMessage(MessageGenerator.have(piece.getIndex())));
                         if (!isMeChocked)
                             sendRequestMessage();
-                        LoggerUtil.LogDownloadingPiece(String.valueOf(connectingPeer.getPeerId()), piece.getIndex(), selfPeer.incrementAndGetNoOfPieces());
+                        LoggerUtil.logDownloadingPiece(String.valueOf(connectingPeer.getPeerId()), piece.getIndex(), selfPeer.incrementAndGetNoOfPieces());
                         if (FileManagementService.hasCompleteFile()) {
                             LoggerUtil.logDebugMessage("My self completed Downloading :" + selfPeer.getPeerId());
                             selfPeer.setHasFile(true);
@@ -166,15 +166,15 @@ public class PeerConnectionHandler extends Thread {
                 }
 
             } catch (SocketException e){
-                LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
                 break;
             }catch (IOException | ClassNotFoundException e) {
-                LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
             }
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
             }
         }
         LoggerUtil.logDebugMessage("Shutting down peer connection handler for " + connectingPeer.getPeerId());
@@ -187,7 +187,7 @@ public class PeerConnectionHandler extends Thread {
             thisPeerInputStream.close();
             connection.close();
         } catch (IOException e) {
-            LoggerUtil.LogErrorMessage(e.getMessage(), e);
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
         }
     }
 

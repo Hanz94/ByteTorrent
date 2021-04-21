@@ -38,7 +38,7 @@ public class PeerManagerPlatform {
             socket = new ServerSocket(selfPeer.getPort());
             LoggerUtil.logDebugMessage("Created server for " + selfPeer.getAddress() + ":" + selfPeer.getPort());
         } catch (Exception e) {
-            LoggerUtil.LogErrorMessage(e.getMessage(), e);
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
         }
 
         this.initServer();
@@ -52,7 +52,7 @@ public class PeerManagerPlatform {
                     try {
                         Thread.sleep(1000*CommonConfig.getUnchokingInterval());
                     } catch (InterruptedException e) {
-                        LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                        LoggerUtil.logErrorMessage(e.getMessage(), e);
                     }
                 }
                 System.out.println("Exit choke");
@@ -67,7 +67,7 @@ public class PeerManagerPlatform {
                     try {
                         Thread.sleep(1000*CommonConfig.getOptimisticUnchokingInterval());
                     } catch (InterruptedException e) {
-                        LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                        LoggerUtil.logErrorMessage(e.getMessage(), e);
                     }
                 }
                 LoggerUtil.logDebugMessage("Exit choke opt");
@@ -90,7 +90,7 @@ public class PeerManagerPlatform {
                         for (Peer peer : peers.values()) {
                             if (!peer.isUp()) {
                                 Socket s = new Socket(peer.getAddress(), peer.getPort());
-                                LoggerUtil.LogMakeTcpConnection(String.valueOf(peer.getPeerId()));
+                                LoggerUtil.logMakeTcpConnection(String.valueOf(peer.getPeerId()));
                                 ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
                                 out.flush();
                                 out.writeObject(new Handshake(selfPeer.getPeerId()));
@@ -104,18 +104,18 @@ public class PeerManagerPlatform {
                             try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
-                                LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                                LoggerUtil.logErrorMessage(e.getMessage(), e);
                             }
                         }
                     } catch (IOException e) {
-                        LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                        LoggerUtil.logErrorMessage(e.getMessage(), e);
                     }
                 }
-                LoggerUtil.LogInfoMessage("Client shut down");
+                LoggerUtil.logInfoMessage("Client shut down");
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                    LoggerUtil.logErrorMessage(e.getMessage(), e);
                 }
             }
         }.start();
@@ -126,15 +126,15 @@ public class PeerManagerPlatform {
             try {
                 new PeerConnectionHandler(socket.accept(), peers, selfPeer).start();
             } catch (IOException e) {
-                LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
             }
         }
         try {
             socket.close();
         } catch (IOException e) {
-            LoggerUtil.LogErrorMessage(e.getMessage(), e);
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
         }
-        LoggerUtil.LogInfoMessage("Server Shut down");
+        LoggerUtil.logInfoMessage("Server Shut down");
         System.exit(0);
     }
 

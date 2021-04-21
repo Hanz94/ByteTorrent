@@ -37,9 +37,9 @@ public class CommonConfig {
             FileSize = Integer.parseInt(info_list.get("FileSize"));
             PieceSize = Integer.parseInt(info_list.get("PieceSize"));
         } catch (FileNotFoundException e) {
-            LoggerUtil.LogErrorMessage("ERROR: Cannot find Common.cfg file", e);
+            LoggerUtil.logErrorMessage("ERROR: Cannot find Common.cfg file", e);
         } catch (IOException e) {
-            LoggerUtil.LogErrorMessage("Cannot open the file", e);
+            LoggerUtil.logErrorMessage("Cannot open the file", e);
         }
     }
 

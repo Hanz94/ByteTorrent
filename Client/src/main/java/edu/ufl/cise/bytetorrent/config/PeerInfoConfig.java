@@ -32,7 +32,7 @@ public class PeerInfoConfig {
             reader.close();
             }
         catch (Exception e){
-            LoggerUtil.LogErrorMessage("ERROR: Cannot find PeerInfo.cfg file", e);
+            LoggerUtil.logErrorMessage("ERROR: Cannot find PeerInfo.cfg file", e);
         }
     }
 

@@ -55,7 +55,7 @@ public class FileManagementService {
 				fos.write(new byte[fSize]);
 				fos.close();
 			} catch (IOException e) {
-				LoggerUtil.LogErrorMessage(e.getMessage(), e);
+				LoggerUtil.logErrorMessage(e.getMessage(), e);
 			}
 		}
 
@@ -100,10 +100,10 @@ public class FileManagementService {
             LoggerUtil.logDebugMessage("reading chunk of file.");
 			return content;
 		} catch (FileNotFoundException e) {
-			LoggerUtil.LogErrorMessage(e.getMessage(), e);
+			LoggerUtil.logErrorMessage(e.getMessage(), e);
 			return null;
 		} catch (IOException e) {
-			LoggerUtil.LogErrorMessage(e.getMessage(), e);
+			LoggerUtil.logErrorMessage(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -122,7 +122,7 @@ public class FileManagementService {
 			filePiecesOwned[index] = true;
 
 		} catch (IOException e) {
-			LoggerUtil.LogErrorMessage(e.getMessage(), e);
+			LoggerUtil.logErrorMessage(e.getMessage(), e);
 		}
 	}
 
