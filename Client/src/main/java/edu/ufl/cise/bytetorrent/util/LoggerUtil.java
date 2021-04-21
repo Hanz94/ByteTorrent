@@ -59,7 +59,7 @@ public class LoggerUtil {
     }
 
     public static void logErrorMessage(String message, Throwable throwable){
-        LogManager.getLogger().error(message, throwable);
+        LogManager.getLogger().trace(message, throwable);
     }
 
     public static void logMakeTcpConnection(String peerID) {
