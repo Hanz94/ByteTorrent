@@ -54,7 +54,7 @@ public class LoggerUtil {
         LogManager.getLogger().info(message);
     }
 
-    public static void LogDebugMessage(String message){
+    public static void logDebugMessage(String message){
         LogManager.getLogger().debug(message);
     }
 

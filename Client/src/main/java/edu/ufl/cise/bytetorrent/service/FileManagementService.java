@@ -14,6 +14,7 @@ import java.util.Random;
 
 import edu.ufl.cise.bytetorrent.config.CommonConfig;
 import edu.ufl.cise.bytetorrent.util.FileUtil;
+import edu.ufl.cise.bytetorrent.util.LoggerUtil;
 
 public class FileManagementService {
 
@@ -50,11 +51,11 @@ public class FileManagementService {
 			FileOutputStream fos = null;
 			try {
 				fos = new FileOutputStream(file);
-				System.out.println("Writing file.");
+				LoggerUtil.logDebugMessage("Writing file.");
 				fos.write(new byte[fSize]);
 				fos.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				LoggerUtil.LogErrorMessage(e.getMessage(), e);
 			}
 		}
 
@@ -96,11 +97,13 @@ public class FileManagementService {
 			byte[] content = new byte[contentSize];
 			fis.read(content);
 			fis.close();
-            System.out.println("reading chunk of file.");
+            LoggerUtil.logDebugMessage("reading chunk of file.");
 			return content;
 		} catch (FileNotFoundException e) {
+			LoggerUtil.LogErrorMessage(e.getMessage(), e);
 			return null;
 		} catch (IOException e) {
+			LoggerUtil.LogErrorMessage(e.getMessage(), e);
 			return null;
 		}
 	}
@@ -119,7 +122,7 @@ public class FileManagementService {
 			filePiecesOwned[index] = true;
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			LoggerUtil.LogErrorMessage(e.getMessage(), e);
 		}
 	}
 

@@ -9,10 +9,8 @@ import edu.ufl.cise.bytetorrent.util.LoggerUtil;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -31,18 +29,16 @@ public class PeerManagerPlatform {
     }
 
     public void init() {
-        LoggerUtil.LogInfoMessage("Starting peer " + selfPeer.getPeerId());
+        LoggerUtil.logDebugMessage("Starting peer " + selfPeer.getPeerId());
 
         new FileManagementService(selfPeer.getPeerId(), selfPeer.isHasFile());
 
         try {
             selfPeer.setBitField(FileManagementService.getBitField());
             socket = new ServerSocket(selfPeer.getPort());
-            System.out.println("Created server for " + selfPeer.getAddress() + ":" + selfPeer.getPort());
-        } catch (IOException e) {
-            e.printStackTrace();
+            LoggerUtil.logDebugMessage("Created server for " + selfPeer.getAddress() + ":" + selfPeer.getPort());
         } catch (Exception e) {
-            e.printStackTrace();
+            LoggerUtil.LogErrorMessage(e.getMessage(), e);
         }
 
         this.initServer();
@@ -56,7 +52,7 @@ public class PeerManagerPlatform {
                     try {
                         Thread.sleep(1000*CommonConfig.getUnchokingInterval());
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        LoggerUtil.LogErrorMessage(e.getMessage(), e);
                     }
                 }
                 System.out.println("Exit choke");
@@ -71,10 +67,10 @@ public class PeerManagerPlatform {
                     try {
                         Thread.sleep(1000*CommonConfig.getOptimisticUnchokingInterval());
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        LoggerUtil.LogErrorMessage(e.getMessage(), e);
                     }
                 }
-                System.out.println("Exit choke opt");
+                LoggerUtil.logDebugMessage("Exit choke opt");
             }
         }).start();
     }
@@ -88,7 +84,7 @@ public class PeerManagerPlatform {
     public void initClient() {
         new Thread() {
             public void run() {
-                LoggerUtil.LogInfoMessage("Initializing client");
+                LoggerUtil.logDebugMessage("Initializing client");
                 while (!selfPeer.isCompletedDownloading()) {
                     try {
                         for (Peer peer : peers.values()) {
@@ -100,28 +96,26 @@ public class PeerManagerPlatform {
                                 out.writeObject(new Handshake(selfPeer.getPeerId()));
                                 out.flush();
                                 out.reset();
-                                System.out.println("Handshake Message sent to peer " + peer.getPeerId() + " from" + selfPeer.getPeerId());
+                                LoggerUtil.logDebugMessage("Handshake Message sent to peer " + peer.getPeerId() + " from" + selfPeer.getPeerId());
                                 peer.setSocket(s);
                                 peer.setUp(true);
                             }
                             // Sleep to not spam
-                            Thread.sleep(1000);
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                LoggerUtil.LogErrorMessage(e.getMessage(), e);
+                            }
                         }
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    } catch (ConnectException e) {
-                        e.printStackTrace();
                     } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        LoggerUtil.LogErrorMessage(e.getMessage(), e);
                     }
                 }
-                System.out.println("Exit client threads");
+                LoggerUtil.LogInfoMessage("Client shut down");
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LoggerUtil.LogErrorMessage(e.getMessage(), e);
                 }
             }
         }.start();
@@ -132,15 +126,15 @@ public class PeerManagerPlatform {
             try {
                 new PeerConnectionHandler(socket.accept(), peers, selfPeer).start();
             } catch (IOException e) {
-                e.printStackTrace();
+                LoggerUtil.LogErrorMessage(e.getMessage(), e);
             }
         }
         try {
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerUtil.LogErrorMessage(e.getMessage(), e);
         }
-        System.out.println("Exit server");
+        LoggerUtil.LogInfoMessage("Server Shut down");
         System.exit(0);
     }
 

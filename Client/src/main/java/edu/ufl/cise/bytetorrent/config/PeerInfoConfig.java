@@ -1,6 +1,7 @@
 package edu.ufl.cise.bytetorrent.config;
 
 import edu.ufl.cise.bytetorrent.model.Peer;
+import edu.ufl.cise.bytetorrent.util.LoggerUtil;
 
 import java.util.ArrayList;
 import java.io.BufferedReader;
@@ -31,7 +32,7 @@ public class PeerInfoConfig {
             reader.close();
             }
         catch (Exception e){
-            System.out.println("ERROR: Cannot find PeerInfo.cfg file");
+            LoggerUtil.LogErrorMessage("ERROR: Cannot find PeerInfo.cfg file", e);
         }
     }
 
