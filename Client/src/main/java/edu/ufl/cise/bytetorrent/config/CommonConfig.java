@@ -1,5 +1,7 @@
 package edu.ufl.cise.bytetorrent.config;
 
+import edu.ufl.cise.bytetorrent.util.LoggerUtil;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -35,9 +37,9 @@ public class CommonConfig {
             FileSize = Integer.parseInt(info_list.get("FileSize"));
             PieceSize = Integer.parseInt(info_list.get("PieceSize"));
         } catch (FileNotFoundException e) {
-            System.out.println("ERROR: Cannot find Common.cfg file");
+            LoggerUtil.logErrorMessage("ERROR: Cannot find Common.cfg file", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerUtil.logErrorMessage("Cannot open the file", e);
         }
     }
 

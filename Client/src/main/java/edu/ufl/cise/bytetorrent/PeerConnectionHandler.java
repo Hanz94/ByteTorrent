@@ -47,30 +47,21 @@ public class PeerConnectionHandler extends Thread {
             try {
                 handshake = (Handshake) in.readObject();
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
             }
 
             Peer thisPeer = peers.get(handshake.getID());
-            LoggerUtil.LogConnectedMsg(String.valueOf(thisPeer.getPeerId()));
+            LoggerUtil.logConnectedMsg(String.valueOf(thisPeer.getPeerId()));
             thisPeer.setConnectionHandler(this);
 
             if (peers.get(handshake.getID()) == null) {
-                System.out.println("Error performing Handshake : PeerId unknown");
+                LoggerUtil.logDebugMessage("Error performing Handshake : PeerId unknown");
             } else {
-                System.out.println("Received Handshake Message : " + handshake.getID());
+                LoggerUtil.logDebugMessage("Received Handshake Message : " + handshake.getID());
                 this.connectingPeer = thisPeer;
-                if (thisPeer.getSocket() == null) {
-                    try {
-                        // waiting for the client connection to be established
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
                 Message bitFieldMessage = MessageGenerator.bitfield(FileManagementService.getBitField());
                 sendMessage(bitFieldMessage);
-                System.out.println("Sent bit field message of length" + bitFieldMessage.getMessageLength());
+                LoggerUtil.logDebugMessage("Sent bit field message of length" + bitFieldMessage.getMessageLength());
                 while (thisPeer.getSocket() == null) {
                     Thread.sleep(1000);
                 }
@@ -79,11 +70,11 @@ public class PeerConnectionHandler extends Thread {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Disconnect with client ");
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
+            LoggerUtil.logDebugMessage("Shutting down peer connection handler for " + connectingPeer.getPeerId());
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Disconnect with Client ");
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
+            LoggerUtil.logDebugMessage("Shutting down peer connection handler for " + connectingPeer.getPeerId());
         }
     }
 
@@ -92,10 +83,10 @@ public class PeerConnectionHandler extends Thread {
             if( msg != null){
                 out.writeObject(msg);
                 out.flush();
-                System.out.println("Send message: " + msg.getMessageType() + " to " + connectingPeer.getPeerId());
+                LoggerUtil.logDebugMessage("Send message: " + msg.getMessageType() + " to " + connectingPeer.getPeerId());
             }
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+        } catch (IOException e) {
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
         }
     }
 
@@ -104,25 +95,25 @@ public class PeerConnectionHandler extends Thread {
             Message message = null;
             try {
                 message = (Message) thisPeerInputStream.readObject();
-                System.out.println("Receive message: " + message.getMessageType() + " from " + connectingPeer.getPeerId());
+                LoggerUtil.logDebugMessage("Receive message: " + message.getMessageType() + " from " + connectingPeer.getPeerId());
 
                 switch (message.getMessageType()) {
                     case CHOKE:
                         isMeChocked = true;
-                        LoggerUtil.LogReceivedChokingMsg(String.valueOf(connectingPeer.getPeerId()));
+                        LoggerUtil.logReceivedChokingMsg(String.valueOf(connectingPeer.getPeerId()));
                         break;
                     case UNCHOKE:
                         isMeChocked = false;
-                        LoggerUtil.LogReceivedUnchokingMsg(String.valueOf(connectingPeer.getPeerId()));
+                        LoggerUtil.logReceivedUnchokingMsg(String.valueOf(connectingPeer.getPeerId()));
                         sendRequestMessage();
                         break;
                     case INTERESTED:
                         connectingPeer.setInterested(true);
-                        LoggerUtil.LogReceivedInterestedMsg(String.valueOf(connectingPeer.getPeerId()));
+                        LoggerUtil.logReceivedInterestedMsg(String.valueOf(connectingPeer.getPeerId()));
                         break;
                     case NOT_INTERESTED:
                         connectingPeer.setInterested(false);
-                        LoggerUtil.LogReceivedNotInterestedMsg(String.valueOf(connectingPeer.getPeerId()));
+                        LoggerUtil.logReceivedNotInterestedMsg(String.valueOf(connectingPeer.getPeerId()));
                         break;
                     case HAVE:
                         HavePayLoad haveIndex = (HavePayLoad) message.getPayload();
@@ -130,11 +121,10 @@ public class PeerConnectionHandler extends Thread {
                             connectingPeer.setBitField(FileUtil.updateBitfield(haveIndex.getIndex(), connectingPeer.getBitField()));
                             if (FileManagementService.getNumFilePieces() == connectingPeer.incrementAndGetNoOfPieces()) {
                                 connectingPeer.setHasFile(true);
-                                System.out.println("Peer completed Downloading :" + connectingPeer.getPeerId());
-                                LoggerUtil.LogCompleteDownload(connectingPeer);
+                                LoggerUtil.logCompleteDownload(connectingPeer);
                                 checkAllDownloaded();
                             }
-                            LoggerUtil.LogReceivedHaveMsg(String.valueOf(connectingPeer.getPeerId()), haveIndex.getIndex());
+                            LoggerUtil.logReceivedHaveMsg(String.valueOf(connectingPeer.getPeerId()), haveIndex.getIndex());
                         }
                         break;
                     case BITFIELD:
@@ -142,10 +132,10 @@ public class PeerConnectionHandler extends Thread {
                         connectingPeer.setBitField(bitFieldPayLoad.getBitfield());
                         connectingPeer.setNoOfPiecesOwned(FileUtil.bitCount(bitFieldPayLoad.getBitfield()));
                         if (!FileManagementService.compareBitfields(bitFieldPayLoad.getBitfield(), selfPeer.getBitField())) {
-                            System.out.println("Peer " + connectingPeer.getPeerId() + " have no any interesting pieces");
+                            LoggerUtil.logDebugMessage("Peer " + connectingPeer.getPeerId() + " have no any interesting pieces");
                             sendMessage(MessageGenerator.notInterested());
                         } else {
-                            System.out.println("Peer " + connectingPeer.getPeerId() + " has interesting pieces");
+                            LoggerUtil.logDebugMessage("Peer " + connectingPeer.getPeerId() + " has interesting pieces");
                             sendMessage(MessageGenerator.interested());
                         }
                         break;
@@ -161,14 +151,14 @@ public class PeerConnectionHandler extends Thread {
                             FileManagementService.store(piece.getContent(), piece.getIndex());
                             selfPeer.setBitField(FileManagementService.getBitField());
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            LoggerUtil.logErrorMessage(e.getMessage(), e);
                         }
                         peers.values().stream().filter(peer -> peer.getConnectionHandler() != null).forEach(peer -> peer.getConnectionHandler().sendMessage(MessageGenerator.have(piece.getIndex())));
                         if (!isMeChocked)
                             sendRequestMessage();
-                        LoggerUtil.LogDownloadingPiece(String.valueOf(connectingPeer.getPeerId()), piece.getIndex(), selfPeer.incrementAndGetNoOfPieces());
+                        LoggerUtil.logDownloadingPiece(String.valueOf(connectingPeer.getPeerId()), piece.getIndex(), selfPeer.incrementAndGetNoOfPieces());
                         if (FileManagementService.hasCompleteFile()) {
-                            System.out.println("My self completed Downloading :" + selfPeer.getPeerId());
+                            LoggerUtil.logDebugMessage("My self completed Downloading :" + selfPeer.getPeerId());
                             selfPeer.setHasFile(true);
                             checkAllDownloaded();
                         }
@@ -176,18 +166,18 @@ public class PeerConnectionHandler extends Thread {
                 }
 
             } catch (SocketException e){
-                e.printStackTrace();
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
                 break;
             }catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
             }
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LoggerUtil.logErrorMessage(e.getMessage(), e);
             }
         }
-        System.out.println("Exit listen messages for " + connectingPeer.getPeerId());
+        LoggerUtil.logDebugMessage("Shutting down peer connection handler for " + connectingPeer.getPeerId());
         cleanUp();
     }
 
@@ -197,7 +187,7 @@ public class PeerConnectionHandler extends Thread {
             thisPeerInputStream.close();
             connection.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerUtil.logErrorMessage(e.getMessage(), e);
         }
     }
 
@@ -214,7 +204,7 @@ public class PeerConnectionHandler extends Thread {
     private void sendRequestMessage() {
         int pieceIdx = FileManagementService.requestPiece(connectingPeer.getBitField(), selfPeer.getBitField(), connectingPeer.getPeerId());
         if (pieceIdx == -1) {
-            System.out.println("No more interesting pieces to request from peer " + connectingPeer.getPeerId());
+            LoggerUtil.logDebugMessage("No more interesting pieces to request from peer " + connectingPeer.getPeerId());
             sendMessage(MessageGenerator.notInterested());
         } else {
             sendMessage(MessageGenerator.request(pieceIdx));
